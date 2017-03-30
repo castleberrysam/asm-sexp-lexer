@@ -8,7 +8,7 @@ extern void yyerror(const char *str);
 
 extern int line_num;
 
-const char * to_lisp_constant(const char *constant);
+char * to_lisp_constant(char *constant);
 %}
 
 %union {
@@ -80,16 +80,13 @@ void yyerror(const char *str)
     exit(1);
 }
 
-const char * to_lisp_constant(const char *constant)
+char * to_lisp_constant(char *constant)
 {
-  size_t len = strlen(constant);
-  if(len < 3
-     || constant[0] != '0'
-     || (constant[1] != 'x'
-	 && constant[1] != 'b'
-	 && constant[1] != 'd')) {return constant;}
-  
-  char *new_constant = strdup(constant);
-  new_constant[0] = '#';
-  return new_constant;
+    if(constant[0] == '0'
+       && (constant [1] == 'x'
+           || constant[1] == 'b'
+           || constant[1] == 'd')) {
+        constant[0] = '#';
+    }
+    return constant;
 }
