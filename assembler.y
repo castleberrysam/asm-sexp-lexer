@@ -39,11 +39,15 @@ argument:
     offset | index | simple_argument
 offset:
     REGISTER PLUS CONSTANT              {printf("%%%s %s", $1, to_lisp_constant($3));}
-index:
+index_open:
     IDXOPEN                             {printf(" (@+ ");}
-    offset
+index_close:
     IDXCLOSE                            {printf(")");}
-    | IDXOPEN REGISTER IDXCLOSE         {printf(" (@+ %%%s 0)", $2);}
+index:
+    index_open offset index_close
+    | index_open
+    REGISTER                            {printf("%%%s 0", $2);}
+    index_close
 simple_argument:
     REGISTER                            {printf(" %%%s", $1);}
     | CONSTANT                          {printf(" %s", to_lisp_constant($1));}
@@ -76,7 +80,7 @@ int main(int argc, char **argv)
 
 void yyerror(const char *str)
 {
-    printf("Line %d: %s\n", line_num, str);
+    printf("\nLine %d: %s\n", line_num, str);
     exit(1);
 }
 
