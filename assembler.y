@@ -1,5 +1,6 @@
 %{
 #include <stdio.h>
+#include <string.h>
 
 extern int yylex();
 extern int yyparse();
@@ -19,6 +20,7 @@ char * to_lisp_constant(char *constant);
 %token <str> REGISTER
 %token <str> CONSTANT
 %token <str> DIRECTIVE
+%token <str> LABEL
 %token <str> WORD
 %%
 program:
@@ -27,6 +29,7 @@ lines:
     line lines | line
 line:
     instruction
+    | label
     | directive
     | NEWLINE                           {printf("\n");}
 instruction:
@@ -52,6 +55,8 @@ simple_argument:
     REGISTER                            {printf(" %%%s", $1);}
     | CONSTANT                          {printf(" %s", to_lisp_constant($1));}
     | WORD                              {printf(" %s", $1);}
+label:
+    LABEL NEWLINE                       {$1[strlen($1)-1] = '\0'; printf("(.label %s)\n", $1);}
 directive:
     DIRECTIVE                           {printf("(%s", $1);}
     simple_argument
